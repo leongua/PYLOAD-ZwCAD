@@ -7,7 +7,7 @@
 [![.NET](https://img.shields.io/badge/.NET-4.7-purple)](https://dotnet.microsoft.com/)
 [![IronPython](https://img.shields.io/badge/IronPython-3.4.1-6a5acd)](https://ironpython.net/)
 
-Ramo **riscritto da zero** per ZWCAD 2026, separato dal bridge storico 2015.
+Bridge separato per **ZWCAD 2026 x64**, mantenuto distinto dalla variante `2015`.
 
 </div>
 
@@ -15,12 +15,8 @@ Ramo **riscritto da zero** per ZWCAD 2026, separato dal bridge storico 2015.
 
 ## Visione
 
-`2026/` non e un semplice porting del vecchio progetto.
-E una base nuova, piu pulita, pensata per:
-
-- seguire piu da vicino la documentazione ZWCAD 2026
-- ridurre il peso dei workaround storici del ramo 2015
-- crescere come bridge principale per il runtime moderno
+`2026/` e la variante dedicata al runtime ZWCAD 2026 x64.
+È mantenuta separata da `2015/` per rispettare differenze di piattaforma, API e comportamento.
 
 ---
 
@@ -46,9 +42,9 @@ E una base nuova, piu pulita, pensata per:
 
 ---
 
-## Stato del ramo
+## Verifica
 
-Questo ramo e gia stato validato con uno smoke test master unico su ZWCAD 2026 reale.
+Questa variante e gia stata validata con uno smoke test master unico su ZWCAD 2026 reale.
 
 Settori gia coperti:
 
@@ -125,15 +121,15 @@ Questo test verifica in un colpo:
 
 Il ramo `2026/` va considerato come:
 
-- **base attiva per il futuro**
 - **progetto separato**
-- **rewrite mantenuto indipendente**
+- **runtime x64**
+- **variante specifica per ZWCAD 2026**
 
-Il ramo `2015/` invece resta:
+Il ramo `2015/` invece e:
 
-- piu ampio come copertura storica
-- utile per ambienti legacy
-- riferimento comportamentale, non base architetturale del rewrite
+- **progetto separato**
+- **runtime x86**
+- **variante specifica per ZWCAD+ 2015**
 
 ---
 
