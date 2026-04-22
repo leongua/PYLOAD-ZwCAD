@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net462</TargetFramework>
+    <Platforms>x86</Platforms>
+    <PlatformTarget>x86</PlatformTarget>
+    <RootNamespace>PYLOAD</RootNamespace>
+    <AssemblyName>PYLOAD</AssemblyName>
+    
+    <UseWindowsForms>true</UseWindowsForms>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    
+    <Version>1.0.0</Version>
+    <Company>Leonardo</Company>
+    <Product>PYLOAD</Product>
+    <RuntimeDistDir>$(MSBuildProjectDirectory)\dist\PYLOAD-runtime</RuntimeDistDir>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    
+    <Reference Include="ZwDatabaseMgd">
+      <HintPath>C:\Program Files (x86)\ZWCAD+ 2015\ZwDatabaseMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ZwManaged">
+      <HintPath>C:\Program Files (x86)\ZWCAD+ 2015\ZwManaged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IronPython" Version="3.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="src\**\*.cs" />
+  </ItemGroup>
+
+  <Target Name="PrepareRuntimeDist" AfterTargets="Build">
+    <ItemGroup>
+      <RuntimeOutputFiles Include="$(TargetDir)**\*.*" />
+      <RuntimeProjectFiles Include="$(MSBuildProjectDirectory)\docs\README.md" />
+      <RuntimeProjectFiles Include="$(MSBuildProjectDirectory)\docs\TODO.md" />
+      <RuntimeProjectFiles Include="$(MSBuildProjectDirectory)\tests\test*.py" />
+    </ItemGroup>
+
+    <RemoveDir Directories="$(RuntimeDistDir)" />
+    <MakeDir Directories="$(RuntimeDistDir)" />
+    <Copy SourceFiles="@(RuntimeOutputFiles)" DestinationFiles="@(RuntimeOutputFiles->'$(RuntimeDistDir)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(RuntimeProjectFiles)" DestinationFiles="@(RuntimeProjectFiles->'$(RuntimeDistDir)\%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

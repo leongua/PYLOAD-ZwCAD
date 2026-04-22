@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net47</TargetFramework>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <RootNamespace>PYLOAD2026R</RootNamespace>
+    <AssemblyName>PYLOAD2026R</AssemblyName>
+    <UseWindowsForms>true</UseWindowsForms>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Version>26.0.0</Version>
+    <Company>Leonardo</Company>
+    <Product>PYLOAD Rewrite 2026</Product>
+    <RuntimeDistDir>$(MSBuildProjectDirectory)\dist\PYLOAD2026R-runtime</RuntimeDistDir>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="ZwDatabaseMgd">
+      <HintPath>C:\Program Files\ZWSOFT\ZWCAD 2026\ZwDatabaseMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="ZwManaged">
+      <HintPath>C:\Program Files\ZWSOFT\ZWCAD 2026\ZwManaged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IronPython" Version="3.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="src\**\*.cs" />
+  </ItemGroup>
+
+  <Target Name="PrepareRuntimeDist" AfterTargets="Build">
+    <ItemGroup>
+      <RuntimeOutputFiles Include="$(TargetDir)**\*.*" />
+      <RuntimeProjectFiles Include="$(MSBuildProjectDirectory)\tests\test_master_2026_fix4.py" />
+      <RuntimeProjectFiles Include="$(MSBuildProjectDirectory)\docs\PYLOAD_2026.md" />
+    </ItemGroup>
+
+    <RemoveDir Directories="$(RuntimeDistDir)" />
+    <MakeDir Directories="$(RuntimeDistDir)" />
+    <Copy SourceFiles="@(RuntimeOutputFiles)" DestinationFiles="@(RuntimeOutputFiles->'$(RuntimeDistDir)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(RuntimeProjectFiles)" DestinationFiles="@(RuntimeProjectFiles->'$(RuntimeDistDir)\%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+</Project>
