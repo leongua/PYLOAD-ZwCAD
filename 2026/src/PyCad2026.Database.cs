@@ -1,17 +1,32 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using ZwSoft.ZwCAD.DatabaseServices;
 
 namespace PYLOAD2026R
 {
     public partial class PyCad2026
     {
+        public ObjectId GetNamedObjectsDictionaryId()
+        {
+            return _db.NamedObjectsDictionaryId;
+        }
+
         public ObjectId GetModelSpaceRecordId()
         {
             using (Transaction tr = _db.TransactionManager.StartTransaction())
             {
                 BlockTable bt = (BlockTable)tr.GetObject(_db.BlockTableId, OpenMode.ForRead);
                 return bt[BlockTableRecord.ModelSpace];
+            }
+        }
+
+        public ObjectId GetPaperSpaceRecordId()
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                BlockTable bt = (BlockTable)tr.GetObject(_db.BlockTableId, OpenMode.ForRead);
+                return bt[BlockTableRecord.PaperSpace];
             }
         }
 
@@ -22,6 +37,126 @@ namespace PYLOAD2026R
                 ObjectId id = EnsureDictionaryPath(tr, _db.NamedObjectsDictionaryId, dictionaryPath);
                 tr.Commit();
                 return id;
+            }
+        }
+
+        public Hashtable GetDictionaryInfo(ObjectId dictionaryId)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                return GetDictionaryInfoInternal(tr, dictionaryId);
+            }
+        }
+
+        public Hashtable GetNamedDictionaryInfo(string dictionaryPath)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                ObjectId id = ResolveDictionaryPath(tr, _db.NamedObjectsDictionaryId, dictionaryPath, false);
+                return GetDictionaryInfoInternal(tr, id);
+            }
+        }
+
+        public ArrayList GetDictionaryEntries(ObjectId dictionaryId)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                return GetDictionaryEntriesInternal(tr, dictionaryId);
+            }
+        }
+
+        public ObjectId[] GetDictionaryEntryIds(ObjectId dictionaryId)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                DBDictionary dict = tr.GetObject(dictionaryId, OpenMode.ForRead) as DBDictionary;
+                if (dict == null) throw new ArgumentException("L'ObjectId non identifica un DBDictionary");
+                List<ObjectId> ids = new List<ObjectId>();
+                foreach (DBDictionaryEntry entry in dict) ids.Add(entry.Value);
+                return ids.ToArray();
+            }
+        }
+
+        public ArrayList GetNamedDictionaryEntries(string dictionaryPath)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                ObjectId id = ResolveDictionaryPath(tr, _db.NamedObjectsDictionaryId, dictionaryPath, false);
+                return GetDictionaryEntriesInternal(tr, id);
+            }
+        }
+
+        public bool DictionaryContains(ObjectId dictionaryId, string key)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                DBDictionary dict = tr.GetObject(dictionaryId, OpenMode.ForRead) as DBDictionary;
+                if (dict == null) throw new ArgumentException("L'ObjectId non identifica un DBDictionary");
+                return dict.Contains(key);
+            }
+        }
+
+        public bool NamedDictionaryContains(string dictionaryPath, string key)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                ObjectId id = ResolveDictionaryPath(tr, _db.NamedObjectsDictionaryId, dictionaryPath, false);
+                DBDictionary dict = tr.GetObject(id, OpenMode.ForRead) as DBDictionary;
+                return dict != null && dict.Contains(key);
+            }
+        }
+
+        public void DeleteDictionaryEntry(ObjectId dictionaryId, string key, bool eraseObject)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                DBDictionary dict = tr.GetObject(dictionaryId, OpenMode.ForWrite) as DBDictionary;
+                if (dict == null) throw new ArgumentException("L'ObjectId non identifica un DBDictionary");
+                if (!dict.Contains(key))
+                {
+                    tr.Commit();
+                    return;
+                }
+
+                DBObject obj = tr.GetObject(dict.GetAt(key), OpenMode.ForWrite);
+                dict.Remove(key);
+                if (eraseObject && obj != null && !obj.IsErased) obj.Erase(true);
+                tr.Commit();
+            }
+        }
+
+        public void DeleteNamedDictionaryEntry(string dictionaryPath, string key, bool eraseObject)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                ObjectId id = ResolveDictionaryPath(tr, _db.NamedObjectsDictionaryId, dictionaryPath, false);
+                DBDictionary dict = tr.GetObject(id, OpenMode.ForWrite) as DBDictionary;
+                if (dict != null && dict.Contains(key))
+                {
+                    DBObject obj = tr.GetObject(dict.GetAt(key), OpenMode.ForWrite);
+                    dict.Remove(key);
+                    if (eraseObject && obj != null && !obj.IsErased) obj.Erase(true);
+                }
+                tr.Commit();
+            }
+        }
+
+        public void SetXRecordData(ObjectId dictionaryId, string key, IList typedValues)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                DBDictionary dict = tr.GetObject(dictionaryId, OpenMode.ForWrite) as DBDictionary;
+                if (dict == null) throw new ArgumentException("L'ObjectId non identifica un DBDictionary");
+                SetXRecordDataInternal(tr, dict, key, typedValues);
+                tr.Commit();
+            }
+        }
+
+        public Hashtable GetXRecordData(ObjectId dictionaryId, string key)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                return GetXRecordDataInternal(tr, dictionaryId, key);
             }
         }
 
@@ -36,20 +171,126 @@ namespace PYLOAD2026R
             }
         }
 
+        public Hashtable GetNamedXRecord(string dictionaryPath, string key)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                ObjectId dictId = ResolveDictionaryPath(tr, _db.NamedObjectsDictionaryId, dictionaryPath, false);
+                return GetXRecordDataInternal(tr, dictId, key);
+            }
+        }
+
         public void SetNamedStringMap(string dictionaryPath, string key, Hashtable values)
         {
             SetNamedXRecord(dictionaryPath, key, BuildStringMapTypedValues(values));
         }
 
-        public void SetEntityStringMap(ObjectId entityId, string subDictionaryPath, string key, Hashtable values)
+        public Hashtable GetNamedStringMap(string dictionaryPath, string key)
+        {
+            Hashtable xrec = GetNamedXRecord(dictionaryPath, key);
+            return ParseStringMapFromXRecord(xrec);
+        }
+
+        public void DeleteNamedXRecord(string dictionaryPath, string key, bool eraseObject)
+        {
+            DeleteNamedDictionaryEntry(dictionaryPath, key, eraseObject);
+        }
+
+        public ObjectId EnsureEntityExtensionDictionary(ObjectId entityId)
         {
             using (Transaction tr = _db.TransactionManager.StartTransaction())
             {
                 DBObject obj = tr.GetObject(entityId, OpenMode.ForWrite);
+                if (obj == null) throw new ArgumentException("entityId non valido");
+                if (obj.ExtensionDictionary.IsNull) obj.CreateExtensionDictionary();
+                tr.Commit();
+                return obj.ExtensionDictionary;
+            }
+        }
+
+        public ArrayList GetEntityExtensionDictionaryEntries(ObjectId entityId)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                DBObject obj = tr.GetObject(entityId, OpenMode.ForRead);
+                if (obj == null || obj.ExtensionDictionary.IsNull) return new ArrayList();
+                return GetDictionaryEntriesInternal(tr, obj.ExtensionDictionary);
+            }
+        }
+
+        public ArrayList GetEntityExtensionDictionaryEntriesAtPath(ObjectId entityId, string subDictionaryPath)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                DBObject obj = tr.GetObject(entityId, OpenMode.ForRead);
+                if (obj == null || obj.ExtensionDictionary.IsNull) return new ArrayList();
+                ObjectId dictId = ResolveDictionaryPath(tr, obj.ExtensionDictionary, subDictionaryPath, false);
+                return GetDictionaryEntriesInternal(tr, dictId);
+            }
+        }
+
+        public void SetEntityXRecord(ObjectId entityId, string subDictionaryPath, string key, IList typedValues)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                DBObject obj = tr.GetObject(entityId, OpenMode.ForWrite);
+                if (obj == null) throw new ArgumentException("entityId non valido");
                 if (obj.ExtensionDictionary.IsNull) obj.CreateExtensionDictionary();
                 ObjectId dictId = EnsureDictionaryPath(tr, obj.ExtensionDictionary, subDictionaryPath);
                 DBDictionary dict = tr.GetObject(dictId, OpenMode.ForWrite) as DBDictionary;
-                SetXRecordDataInternal(tr, dict, key, BuildStringMapTypedValues(values));
+                SetXRecordDataInternal(tr, dict, key, typedValues);
+                tr.Commit();
+            }
+        }
+
+        public Hashtable GetEntityXRecord(ObjectId entityId, string subDictionaryPath, string key)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                DBObject obj = tr.GetObject(entityId, OpenMode.ForRead);
+                if (obj == null || obj.ExtensionDictionary.IsNull)
+                {
+                    Hashtable empty = NewInfo();
+                    empty["key"] = key;
+                    empty["count"] = 0;
+                    empty["values"] = new ArrayList();
+                    return empty;
+                }
+                ObjectId dictId = ResolveDictionaryPath(tr, obj.ExtensionDictionary, subDictionaryPath, false);
+                return GetXRecordDataInternal(tr, dictId, key);
+            }
+        }
+
+        public void SetEntityStringMap(ObjectId entityId, string subDictionaryPath, string key, Hashtable values)
+        {
+            SetEntityXRecord(entityId, subDictionaryPath, key, BuildStringMapTypedValues(values));
+        }
+
+        public Hashtable GetEntityStringMap(ObjectId entityId, string subDictionaryPath, string key)
+        {
+            Hashtable xrec = GetEntityXRecord(entityId, subDictionaryPath, key);
+            return ParseStringMapFromXRecord(xrec);
+        }
+
+        public void DeleteEntityXRecord(ObjectId entityId, string subDictionaryPath, string key, bool eraseObject)
+        {
+            using (Transaction tr = _db.TransactionManager.StartTransaction())
+            {
+                DBObject obj = tr.GetObject(entityId, OpenMode.ForRead);
+                if (obj == null || obj.ExtensionDictionary.IsNull)
+                {
+                    tr.Commit();
+                    return;
+                }
+
+                ObjectId dictId = ResolveDictionaryPath(tr, obj.ExtensionDictionary, subDictionaryPath, false);
+                DBDictionary dict = tr.GetObject(dictId, OpenMode.ForWrite) as DBDictionary;
+                if (dict != null && dict.Contains(key))
+                {
+                    DBObject dbo = tr.GetObject(dict.GetAt(key), OpenMode.ForWrite);
+                    dict.Remove(key);
+                    if (eraseObject && dbo != null && !dbo.IsErased) dbo.Erase(true);
+                }
                 tr.Commit();
             }
         }
@@ -60,6 +301,7 @@ namespace PYLOAD2026R
             {
                 BlockTableRecord owner = tr.GetObject(ownerId, OpenMode.ForWrite) as BlockTableRecord;
                 if (owner == null) throw new NotSupportedException("CloneObjectsToOwner 2026R supporta solo BlockTableRecord");
+
                 ArrayList ids = new ArrayList();
                 foreach (object raw in objectIds)
                 {
@@ -81,37 +323,40 @@ namespace PYLOAD2026R
         public void CopyXRecordBetweenDictionaries(ObjectId sourceDictionaryId, string sourceKey, ObjectId targetDictionaryId, string targetKey, bool overwrite)
         {
             Hashtable data = GetXRecordData(sourceDictionaryId, sourceKey);
+            int count = Convert.ToInt32(data["count"]);
+            if (count == 0) return;
+
             using (Transaction tr = _db.TransactionManager.StartTransaction())
             {
                 DBDictionary target = tr.GetObject(targetDictionaryId, OpenMode.ForWrite) as DBDictionary;
+                if (target == null) throw new ArgumentException("targetDictionaryId non identifica un DBDictionary");
+
+                if (target.Contains(targetKey))
+                {
+                    if (!overwrite)
+                    {
+                        tr.Commit();
+                        return;
+                    }
+
+                    DBObject old = tr.GetObject(target.GetAt(targetKey), OpenMode.ForWrite);
+                    target.Remove(targetKey);
+                    if (old != null && !old.IsErased) old.Erase(true);
+                }
+
                 SetXRecordDataInternal(tr, target, targetKey, data["values"] as IList);
                 tr.Commit();
             }
         }
 
-        public Hashtable GetXRecordData(ObjectId dictionaryId, string key)
+        public void CopyXRecordBetweenNamedDictionaries(string sourceDictionaryPath, string sourceKey, string targetDictionaryPath, string targetKey, bool overwrite)
         {
             using (Transaction tr = _db.TransactionManager.StartTransaction())
             {
-                DBDictionary dict = tr.GetObject(dictionaryId, OpenMode.ForRead) as DBDictionary;
-                Hashtable info = NewInfo();
-                ArrayList values = new ArrayList();
-                info["values"] = values;
-                info["count"] = 0;
-                if (dict == null || !dict.Contains(key)) return info;
-                Xrecord xrec = tr.GetObject(dict.GetAt(key), OpenMode.ForRead) as Xrecord;
-                if (xrec != null && xrec.Data != null)
-                {
-                    foreach (TypedValue tv in xrec.Data)
-                    {
-                        Hashtable item = NewInfo();
-                        item["type_code"] = tv.TypeCode;
-                        item["value"] = tv.Value;
-                        values.Add(item);
-                    }
-                    info["count"] = values.Count;
-                }
-                return info;
+                ObjectId sourceId = ResolveDictionaryPath(tr, _db.NamedObjectsDictionaryId, sourceDictionaryPath, false);
+                ObjectId targetId = EnsureDictionaryPath(tr, _db.NamedObjectsDictionaryId, targetDictionaryPath);
+                tr.Commit();
+                CopyXRecordBetweenDictionaries(sourceId, sourceKey, targetId, targetKey, overwrite);
             }
         }
 
@@ -119,94 +364,217 @@ namespace PYLOAD2026R
         {
             using (Transaction tr = _db.TransactionManager.StartTransaction())
             {
-                ObjectId root = ResolveDictionaryPath(tr, _db.NamedObjectsDictionaryId, dictionaryPath);
+                ObjectId root = ResolveDictionaryPath(tr, _db.NamedObjectsDictionaryId, dictionaryPath, false);
                 ArrayList items = new ArrayList();
-                WalkDictionaryTree(tr, root, NormalizeDictionaryPath(dictionaryPath), 0, maxDepth, items);
+                WalkDictionaryTree(tr, root, NormalizeDictionaryPath(dictionaryPath), 0, Math.Max(0, maxDepth), items);
                 return items;
             }
         }
 
-        private static string NormalizeDictionaryPath(string path) { return string.IsNullOrWhiteSpace(path) ? string.Empty : path.Trim().Replace("\\", "/").Trim('/'); }
-
-        private static ObjectId ResolveDictionaryPath(Transaction tr, ObjectId rootId, string path)
+        private static ResultBuffer BuildResultBuffer(IList typedValues)
         {
-            string[] parts = NormalizeDictionaryPath(path).Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-            ObjectId current = rootId;
-            foreach (string part in parts)
-            {
-                DBDictionary dict = tr.GetObject(current, OpenMode.ForRead) as DBDictionary;
-                if (dict == null || !dict.Contains(part)) throw new ArgumentException("Dictionary path non trovato: " + path);
-                current = dict.GetAt(part);
-            }
-            return current;
-        }
-
-        private static ObjectId EnsureDictionaryPath(Transaction tr, ObjectId rootId, string path)
-        {
-            string[] parts = NormalizeDictionaryPath(path).Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-            ObjectId current = rootId;
-            foreach (string part in parts)
-            {
-                DBDictionary dict = tr.GetObject(current, OpenMode.ForWrite) as DBDictionary;
-                if (!dict.Contains(part))
-                {
-                    DBDictionary child = new DBDictionary();
-                    current = dict.SetAt(part, child);
-                    tr.AddNewlyCreatedDBObject(child, true);
-                }
-                else current = dict.GetAt(part);
-            }
-            return current;
-        }
-
-        private static IList BuildStringMapTypedValues(Hashtable values)
-        {
-            ArrayList items = new ArrayList();
-            if (values == null) return items;
-            foreach (DictionaryEntry de in values)
-            {
-                Hashtable k = new Hashtable(); k["type_code"] = 1000; k["value"] = Convert.ToString(de.Key); items.Add(k);
-                Hashtable v = new Hashtable(); v["type_code"] = 1000; v["value"] = Convert.ToString(de.Value); items.Add(v);
-            }
-            return items;
-        }
-
-        private static void SetXRecordDataInternal(Transaction tr, DBDictionary dict, string key, IList typedValues)
-        {
-            ResultBuffer rb = new ResultBuffer();
+            List<TypedValue> values = new List<TypedValue>();
             if (typedValues != null)
             {
                 foreach (object raw in typedValues)
                 {
                     Hashtable item = raw as Hashtable;
                     if (item == null) continue;
-                    rb.Add(new TypedValue(Convert.ToInt16(item["type_code"]), item["value"]));
+                    values.Add(new TypedValue(Convert.ToInt16(item["type_code"]), item["value"]));
                 }
             }
+            return new ResultBuffer(values.ToArray());
+        }
+
+        private void SetXRecordDataInternal(Transaction tr, DBDictionary dict, string key, IList typedValues)
+        {
             Xrecord xrec;
-            if (dict.Contains(key)) xrec = tr.GetObject(dict.GetAt(key), OpenMode.ForWrite) as Xrecord;
+            if (dict.Contains(key))
+            {
+                xrec = tr.GetObject(dict.GetAt(key), OpenMode.ForWrite) as Xrecord;
+                if (xrec == null) throw new InvalidOperationException("La chiave esiste ma non punta a un Xrecord");
+            }
             else
             {
                 xrec = new Xrecord();
                 dict.SetAt(key, xrec);
                 tr.AddNewlyCreatedDBObject(xrec, true);
             }
-            xrec.Data = rb;
+            xrec.Data = BuildResultBuffer(typedValues);
         }
 
-        private static void WalkDictionaryTree(Transaction tr, ObjectId dictId, string path, int depth, int maxDepth, ArrayList items)
+        private Hashtable GetXRecordDataInternal(Transaction tr, ObjectId dictionaryId, string key)
         {
-            DBDictionary dict = tr.GetObject(dictId, OpenMode.ForRead) as DBDictionary;
-            if (dict == null) return;
+            DBDictionary dict = tr.GetObject(dictionaryId, OpenMode.ForRead) as DBDictionary;
+            if (dict == null) throw new ArgumentException("dictionaryId non identifica un DBDictionary");
+
+            Hashtable info = NewInfo();
+            info["key"] = key;
+            ArrayList values = new ArrayList();
+            info["values"] = values;
+
+            if (!dict.Contains(key))
+            {
+                info["count"] = 0;
+                return info;
+            }
+
+            Xrecord xrec = tr.GetObject(dict.GetAt(key), OpenMode.ForRead) as Xrecord;
+            if (xrec == null || xrec.Data == null)
+            {
+                info["count"] = 0;
+                return info;
+            }
+
+            foreach (TypedValue tv in xrec.Data)
+            {
+                Hashtable item = NewInfo();
+                item["type_code"] = tv.TypeCode;
+                item["value"] = tv.Value;
+                values.Add(item);
+            }
+
+            info["count"] = values.Count;
+            return info;
+        }
+
+        private static ObjectId EnsureDictionaryPath(Transaction tr, ObjectId rootDictionaryId, string dictionaryPath)
+        {
+            return ResolveDictionaryPath(tr, rootDictionaryId, dictionaryPath, true);
+        }
+
+        private static ObjectId ResolveDictionaryPath(Transaction tr, ObjectId rootDictionaryId, string dictionaryPath, bool createMissing)
+        {
+            if (string.IsNullOrWhiteSpace(dictionaryPath)) return rootDictionaryId;
+
+            string[] parts = dictionaryPath.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries);
+            ObjectId currentId = rootDictionaryId;
+            foreach (string rawPart in parts)
+            {
+                string part = rawPart.Trim();
+                if (part.Length == 0) continue;
+
+                DBDictionary current = tr.GetObject(currentId, createMissing ? OpenMode.ForWrite : OpenMode.ForRead) as DBDictionary;
+                if (current == null) throw new InvalidOperationException("Percorso dizionario non valido");
+
+                if (!current.Contains(part))
+                {
+                    if (!createMissing) throw new ArgumentException("Dizionario non trovato: " + dictionaryPath);
+                    DBDictionary child = new DBDictionary();
+                    current.SetAt(part, child);
+                    tr.AddNewlyCreatedDBObject(child, true);
+                    currentId = child.ObjectId;
+                }
+                else
+                {
+                    currentId = current.GetAt(part);
+                }
+            }
+
+            return currentId;
+        }
+
+        private static string NormalizeDictionaryPath(string dictionaryPath)
+        {
+            if (string.IsNullOrWhiteSpace(dictionaryPath)) return string.Empty;
+            return dictionaryPath.Replace('\\', '/').Trim('/');
+        }
+
+        private static Hashtable GetDictionaryInfoInternal(Transaction tr, ObjectId dictionaryId)
+        {
+            DBDictionary dict = tr.GetObject(dictionaryId, OpenMode.ForRead) as DBDictionary;
+            if (dict == null) throw new ArgumentException("L'ObjectId non identifica un DBDictionary");
+            Hashtable info = new Hashtable();
+            info["id"] = dictionaryId.ToString();
+            info["handle"] = dict.Handle.ToString();
+            info["count"] = dict.Count;
+            info["owner_id"] = dict.OwnerId.ToString();
+            return info;
+        }
+
+        private static ArrayList GetDictionaryEntriesInternal(Transaction tr, ObjectId dictionaryId)
+        {
+            DBDictionary dict = tr.GetObject(dictionaryId, OpenMode.ForRead) as DBDictionary;
+            ArrayList items = new ArrayList();
+            if (dict == null) return items;
+
             foreach (DBDictionaryEntry entry in dict)
             {
+                DBObject dbo = tr.GetObject(entry.Value, OpenMode.ForRead);
                 Hashtable item = new Hashtable();
-                item["path"] = string.IsNullOrWhiteSpace(path) ? entry.Key : (path + "/" + entry.Key);
-                item["depth"] = depth;
-                item["id"] = entry.Value;
+                item["key"] = entry.Key;
+                item["id"] = entry.Value.ToString();
+                item["handle"] = dbo.Handle.ToString();
+                item["type"] = dbo.GetType().Name;
+                item["dxf_name"] = dbo.GetRXClass().DxfName;
                 items.Add(item);
-                if (depth < maxDepth) WalkDictionaryTree(tr, entry.Value, Convert.ToString(item["path"]), depth + 1, maxDepth, items);
             }
+            return items;
+        }
+
+        private static void WalkDictionaryTree(Transaction tr, ObjectId dictionaryId, string path, int depth, int maxDepth, ArrayList items)
+        {
+            DBDictionary dict = tr.GetObject(dictionaryId, OpenMode.ForRead) as DBDictionary;
+            if (dict == null) return;
+
+            foreach (DBDictionaryEntry entry in dict)
+            {
+                DBObject dbo = tr.GetObject(entry.Value, OpenMode.ForRead);
+                string nextPath = string.IsNullOrEmpty(path) ? entry.Key : (path + "/" + entry.Key);
+                Hashtable item = new Hashtable();
+                item["path"] = nextPath;
+                item["depth"] = depth;
+                item["id"] = entry.Value.ToString();
+                item["type"] = dbo.GetType().Name;
+                item["dxf_name"] = dbo.GetRXClass().DxfName;
+                items.Add(item);
+
+                if (depth < maxDepth && dbo is DBDictionary)
+                {
+                    WalkDictionaryTree(tr, entry.Value, nextPath, depth + 1, maxDepth, items);
+                }
+            }
+        }
+
+        private static ArrayList BuildStringMapTypedValues(Hashtable values)
+        {
+            ArrayList items = new ArrayList();
+            if (values == null) return items;
+            foreach (DictionaryEntry entry in values)
+            {
+                Hashtable k = new Hashtable();
+                k["type_code"] = 1000;
+                k["value"] = Convert.ToString(entry.Key);
+                items.Add(k);
+
+                Hashtable v = new Hashtable();
+                v["type_code"] = 1000;
+                v["value"] = Convert.ToString(entry.Value);
+                items.Add(v);
+            }
+            return items;
+        }
+
+        private static Hashtable ParseStringMapFromXRecord(Hashtable xrec)
+        {
+            Hashtable map = new Hashtable();
+            map["key"] = xrec["key"];
+            Hashtable pairs = new Hashtable();
+            map["pairs"] = pairs;
+
+            ArrayList values = xrec["values"] as ArrayList;
+            if (values != null)
+            {
+                for (int i = 0; i + 1 < values.Count; i += 2)
+                {
+                    Hashtable k = values[i] as Hashtable;
+                    Hashtable v = values[i + 1] as Hashtable;
+                    if (k == null || v == null) continue;
+                    pairs[Convert.ToString(k["value"])] = Convert.ToString(v["value"]);
+                }
+            }
+            map["count"] = pairs.Count;
+            return map;
         }
     }
 }

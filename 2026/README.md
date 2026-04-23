@@ -138,6 +138,7 @@ Il ramo `2015/` invece e:
 Per il contesto tecnico completo:
 
 - guida specifica del ramo: [`docs/PYLOAD_2026.md`](./docs/PYLOAD_2026.md)
+- indice API: [`docs/API_REFERENCE_2026.md`](./docs/API_REFERENCE_2026.md)
 
 Quella guida spiega:
 

@@ -42,7 +42,7 @@ namespace PYLOAD2026R
 
         public string GetBuildMarker()
         {
-            return "PYLOAD2026R-FIX8";
+            return "PYLOAD2026R-FIX20";
         }
 
         public string GetEntityHandle(ObjectId entityId)
@@ -105,8 +105,7 @@ namespace PYLOAD2026R
 
         public void ZoomExtents()
         {
-            LogShell("in", "command", "_.ZOOM _E");
-            _doc.SendStringToExecute("_.ZOOM _E ", true, false, false);
+            RunLisp("(command \"_.ZOOM\" \"_E\")");
         }
 
         internal ObjectId AddEntity(Entity entity)

@@ -97,6 +97,7 @@ dotnet build .\2015\PYLOAD.csproj -c Release
 ### Riferimenti
 
 - doc principale: [`2015/docs/README.md`](./2015/docs/README.md)
+- reference API: [`2015/docs/API_REFERENCE_2015.md`](./2015/docs/API_REFERENCE_2015.md)
 - note operative: [`2015/docs/TODO.md`](./2015/docs/TODO.md)
 
 ---
@@ -153,6 +154,7 @@ dotnet build .\2026\PYLOAD.Rewrite2026.csproj -c Release
 ### Riferimenti
 
 - guida 2026: [`2026/docs/PYLOAD_2026.md`](./2026/docs/PYLOAD_2026.md)
+- reference API: [`2026/docs/API_REFERENCE_2026.md`](./2026/docs/API_REFERENCE_2026.md)
 - smoke test master: [`2026/tests/test_master_2026_fix4.py`](./2026/tests/test_master_2026_fix4.py)
 
 ---

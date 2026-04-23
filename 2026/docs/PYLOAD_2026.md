@@ -256,3 +256,49 @@ La regola migliore resta:
 - la guida 2026 orienta
 - il codice compila
 - ZWCAD reale conferma
+
+## Appendice API (Rewrite 2026 - FIX16)
+
+Batch/API aggiunte per test massivi in un solo avvio:
+
+- `GetLayoutNamesFromBlockTable()`
+- `GetSpaceEntityStats()`
+- `GetEntitiesInSpace(spaceName)`
+- `EraseByLayerBatch(layerName, onlyModelSpace)`
+- `EraseByTypeBatch(dxfType, onlyModelSpace)`
+- `EraseByDxfFilterBatch(dxfFilters, onlyModelSpace)`
+- `GetEntityPropertySnapshot(entityId)`
+- `ApplyEntityPropertySnapshot(entityIds, snapshot)`
+- `BuildIntersectionsMatrix(curveIds, extendThis, extendArgument)`
+- `BreakCurvesAtAllIntersectionsBatch(curveIds, eraseSource)`
+- `AutoTrimExtendByBoundaries(curveIds, boundaryIds, trimMode, extendMode, eraseSource)`
+- `OffsetEntitiesTowardSeedsBatch(jobs)`
+- `CopyTransformBatch(jobs)`
+- `ExportEntityAuditCsv(outputPath, entityIds)`
+- `ExportDatabaseSnapshot(outputPath, dictionaryPath, maxDepth)`
+
+Script di test massivo:
+
+- `v2026_rewrite/tests/test_batch_2026_massive_expand.py`
+- `v2026_rewrite/tests/test_batch_2026_ultra_massive2.py`
+- `v2026_rewrite/tests/test_batch_2026_ultra_massive3_cs.py`
+- `v2026_rewrite/tests/test_batch_2026_fix19_megabatch.py`
+
+API aggiunte in FIX17 (massive cs):
+
+- `GetPublicApiMethodNames(containsFilter)`
+- `ExportApiMethodsReport(outputPath, containsFilter)`
+- `RunDeterministicModifyPack(baseX, baseY, baseZ)`
+
+API aggiunte in FIX19:
+
+- `GetSpaceSummary(spaceName)`
+- `AddPaperViewportToSpace(spaceName, centerX, centerY, width, height, viewCenterX, viewCenterY, viewHeight)`
+- `GetViewportIdsInSpace(spaceName)`
+- `EraseViewportsInSpace(spaceName, keepFirst)`
+- `GetBlockReferenceIdsByName(blockName)`
+- `ReplaceBlockReferencesByName(sourceBlockName, newBlockName, preserveAttributeValues, eraseSource)`
+- `ReplaceBlockReferencesByMap(replacementMap, preserveAttributeValues, eraseSource)`
+- `SyncBlockReferenceAttributesByName(blockName, overwriteExistingText)`
+- `UpdateBlockAttributesByNameMap(blockName, values)`
+- `ExportApiCompatibilityReport(outputPath, requiredMethods)`

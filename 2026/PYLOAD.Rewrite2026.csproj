@@ -38,7 +38,7 @@
   <Target Name="PrepareRuntimeDist" AfterTargets="Build">
     <ItemGroup>
       <RuntimeOutputFiles Include="$(TargetDir)**\*.*" />
-      <RuntimeProjectFiles Include="$(MSBuildProjectDirectory)\tests\test_master_2026_fix4.py" />
+      <RuntimeProjectFiles Include="$(MSBuildProjectDirectory)\tests\test*.py" />
       <RuntimeProjectFiles Include="$(MSBuildProjectDirectory)\docs\PYLOAD_2026.md" />
     </ItemGroup>
 

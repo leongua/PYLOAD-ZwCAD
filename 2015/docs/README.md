@@ -2,6 +2,10 @@
 
 Bridge C# per eseguire script Python dentro ZWCAD 2015.
 
+## Documentazione API
+
+- indice API 2015: [`API_REFERENCE_2015.md`](./API_REFERENCE_2015.md)
+
 ## Scopo
 
 `PYLOAD` carica un file `.py` scelto dall'utente ed esegue lo script nel contesto del disegno attivo, esponendo oggetti ZWCAD utili allo scripting.
