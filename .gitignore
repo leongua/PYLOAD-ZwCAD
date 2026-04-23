@@ -11,6 +11,7 @@ obj/
 2026/obj/
 2026/dist/
 2026/builds/
+2026/build_tmp*/
 
 *.user
 *.suo
