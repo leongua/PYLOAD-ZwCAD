@@ -13,6 +13,10 @@ Oggetti disponibili nello scope script:
 - `ed` (editor attivo)
 - `cad` (helper API)
 
+Documento tabellare dedicato:
+
+- [`CAD_HELPER_2026.md`](./CAD_HELPER_2026.md)
+
 ## Totale API pubbliche
 
 - **247** metodi pubblici nel bridge (cartella `2026/src`).

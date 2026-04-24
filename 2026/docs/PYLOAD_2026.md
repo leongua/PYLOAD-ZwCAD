@@ -81,4 +81,5 @@ Carica la DLL in ZWCAD con `NETLOAD` e poi esegui `PYLOAD2026R`.
 
 Per la lista API del progetto 2026:
 
+- helper `cad` tabellare: [`CAD_HELPER_2026.md`](./CAD_HELPER_2026.md)
 - [`API_REFERENCE_2026.md`](./API_REFERENCE_2026.md)

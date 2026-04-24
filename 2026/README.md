@@ -30,4 +30,5 @@ dotnet build .\2026\PYLOAD.Rewrite2026.csproj -c Release
 ## Documentazione
 
 - guida operativa: [`docs/PYLOAD_2026.md`](./docs/PYLOAD_2026.md)
+- helper `cad`: [`docs/CAD_HELPER_2026.md`](./docs/CAD_HELPER_2026.md)
 - lista API: [`docs/API_REFERENCE_2026.md`](./docs/API_REFERENCE_2026.md)
