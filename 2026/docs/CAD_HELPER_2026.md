@@ -78,3 +78,4 @@ Catalogo operativo dell'helper `cad` esposto dagli script Python lanciati con `P
 
 - Marker build corrente usato nei test: `cad.GetBuildMarker()`
 - Catalogo API esteso: [`API_REFERENCE_2026.md`](./API_REFERENCE_2026.md)
+- Reference parametri (AddText/AddMText/AddLeader/AddLightWeightPolyline/AddPolyline): sezione "Reference dettagliata" in [`API_REFERENCE_2026.md`](./API_REFERENCE_2026.md)

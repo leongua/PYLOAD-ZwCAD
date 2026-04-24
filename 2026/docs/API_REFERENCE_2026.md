@@ -53,6 +53,160 @@ Documento tabellare dedicato:
 - Advanced/massive: `BuildIntersectionsMatrix`, `CopyTransformBatch`, `ExportEntityAuditCsv`, `ExportDatabaseSnapshot`, `RunDeterministicModifyPack`
 - FIX19+: `GetSpaceSummary`, `AddPaperViewportToSpace`, `ReplaceBlockReferencesByMap`, `ExportApiCompatibilityReport`
 
+## Reference dettagliata: creazione testo/leader/polilinee
+
+Fonte firme: `2026/src/PyCad2026.Geometry.cs`.
+
+### `AddText`
+
+Signature:
+
+```csharp
+ObjectId AddText(string text, double x, double y, double z, double height)
+```
+
+Parametri:
+
+- `text`: contenuto DBText (`null` -> stringa vuota).
+- `x`, `y`, `z`: punto di inserimento WCS.
+- `height`: altezza testo.
+
+Return:
+
+- `ObjectId` dell'entità `DBText` creata.
+
+Note operative:
+
+- Il metodo imposta `TextString`, `Position`, `Height`.
+- Layer/stile correnti dipendono dal contesto DWG attivo.
+
+Python:
+
+```python
+tid = cad.AddText("NOTE 2026", 100.0, 50.0, 0.0, 2.5)
+```
+
+### `AddMText`
+
+Signature:
+
+```csharp
+ObjectId AddMText(string text, double x, double y, double z, double textHeight, double width)
+```
+
+Parametri:
+
+- `text`: contenuto MTEXT (`null` -> stringa vuota).
+- `x`, `y`, `z`: `Location` MTEXT in WCS.
+- `textHeight`: altezza carattere.
+- `width`: larghezza box MTEXT.
+
+Return:
+
+- `ObjectId` dell'entità `MText`.
+
+Python:
+
+```python
+mtid = cad.AddMText("Titolo\\nseconda riga", 120.0, 70.0, 0.0, 2.5, 40.0)
+```
+
+### `AddLeader`
+
+Signature:
+
+```csharp
+ObjectId AddLeader(IList coordinates, ObjectId annotationId)
+```
+
+Parametri:
+
+- `coordinates`: lista flat XYZ `[x1, y1, z1, x2, y2, z2, ...]`.
+- `annotationId`: `ObjectId` annotazione da agganciare (atteso `MText`; `ObjectId.Null` per nessuna annotazione).
+
+Vincoli input:
+
+- Minimo 2 vertici (quindi almeno 6 valori).
+- Lunghezza lista multipla di 3.
+
+Return:
+
+- `ObjectId` dell'entità `Leader`.
+
+Errori:
+
+- `ArgumentException` se `coordinates` non valido.
+
+Comportamento interno:
+
+- `HasArrowHead = true` di default.
+- Se `annotationId` è valido e punta a `MText`, viene impostata `leader.Annotation` e chiamata `EvaluateLeader()`.
+
+Python:
+
+```python
+note = cad.AddMText("LEADER NOTE", 200.0, 80.0, 0.0, 2.5, 35.0)
+lid = cad.AddLeader([180, 60, 0, 190, 70, 0, 200, 80, 0], note)
+```
+
+### `AddPolyline`
+
+Signature:
+
+```csharp
+ObjectId AddPolyline(IList coordinates, bool closed)
+```
+
+Parametri:
+
+- `coordinates`: lista flat XY `[x1, y1, x2, y2, ...]`.
+- `closed`: `true` per polilinea chiusa, `false` aperta.
+
+Vincoli input:
+
+- Almeno 2 punti (minimo 4 valori).
+- Numero valori pari (coppie XY).
+
+Return:
+
+- `ObjectId` dell'entità `Polyline` (LWPOLYLINE lato DXF).
+
+Errori:
+
+- `ArgumentException` se lista nulla/corta/dispari.
+
+Dettagli:
+
+- Ogni vertice viene creato con bulge/startWidth/endWidth a `0.0`.
+
+Python:
+
+```python
+pl = cad.AddPolyline([0, 0, 50, 0, 50, 30, 0, 30], True)
+```
+
+### `AddLightWeightPolyline`
+
+Signature:
+
+```csharp
+ObjectId AddLightWeightPolyline(IList coordinates, bool closed)
+```
+
+Parametri/ritorno:
+
+- Uguali a `AddPolyline`.
+
+Comportamento:
+
+- Alias diretto: internamente chiama `AddPolyline(coordinates, closed)`.
+
+Python:
+
+```python
+lwp = cad.AddLightWeightPolyline([10, 10, 40, 10, 40, 25], False)
+```
+
 ## Metodi aggiunti nei batch recenti
 
 - command channel pulito: `RunCommandNoiseFree`, `RunCommandsNoiseFree`, `CommandSilent`, `FlushCommandChannel`
