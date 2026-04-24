@@ -33,6 +33,28 @@ Quando uno script viene avviato dal loader, sono disponibili:
 - `ed`
 - `cad`
 
+## Helper `cad` (2026)
+
+L'helper `cad` è l'API Python del bridge 2026.
+
+Esempi rapidi:
+
+```python
+cad.Msg("[PY] start")
+line_id = cad.AddLine(0, 0, 0, 100, 0, 0)
+cad.RunCommandsNoiseFree(["_.REGEN"], True, True, 1)
+```
+
+```python
+hits = cad.GetSelectionByDxf([{"code": 0, "value": "LINE"}])
+cad.Msg("linee trovate: " + str(len(hits)))
+```
+
+```python
+cad.SetNamedStringMap("PYLOAD/META", "RUN", {"batch": "fix22"})
+meta = cad.GetNamedStringMap("PYLOAD/META", "RUN")
+```
+
 ## Build e deploy
 
 ```powershell

@@ -2,6 +2,17 @@
 
 Indice API del progetto `2026/` (ZWCAD 2026 x64).
 
+## Helper `cad`
+
+Negli script Python caricati con `PYLOAD2026R`, l'oggetto `cad` espone tutti i metodi pubblici del bridge.
+
+Oggetti disponibili nello scope script:
+
+- `doc` (documento attivo)
+- `db` (database attivo)
+- `ed` (editor attivo)
+- `cad` (helper API)
+
 ## Totale API pubbliche
 
 - **247** metodi pubblici nel bridge (cartella `2026/src`).
