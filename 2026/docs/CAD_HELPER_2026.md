@@ -1,81 +1,46 @@
 # CAD Helper 2026 (`cad`)
 
-Catalogo operativo dell'helper `cad` esposto dagli script Python lanciati con `PYLOAD2026R`.
+Catalogo operativo del bridge esposto negli script `PYLOAD2026R`.
 
 ## Oggetti disponibili nello script
 
-| Oggetto | Tipo | Scopo |
-|---|---|---|
-| `doc` | Documento ZWCAD | accesso al documento attivo |
-| `db` | Database ZWCAD | accesso al database DWG attivo |
-| `ed` | Editor ZWCAD | prompt e messaggi command line |
-| `cad` | Bridge C# 2026 | API ad alto livello per script |
+| Oggetto | Ruolo |
+|---|---|
+| `cad` | helper API C# |
+| `doc` | documento attivo |
+| `db` | database DWG attivo |
+| `ed` | editor/command line |
 
-## Metodi `cad` (tabella)
+## Moduli helper caricati (sorgente reale)
 
-| Metodo / Pattern | Modulo | Descrizione breve |
-|---|---|---|
-| `GetBuildMarker`, `Msg`, `GetPoint` | `PyCad2026.Core.cs` | funzioni base runtime e prompt |
-| `GetShellTranscript*`, `ClearShellTranscript` | `PyCad2026.Core.cs` | lettura/gestione transcript shell |
-| `RunCommand`, `RunCommands`, `SendEnter`, `CancelActiveCommand` | `PyCad2026.Commands.cs` | invio comandi al command line |
-| `RunCommandNoiseFree`, `RunCommandsNoiseFree`, `FlushCommandChannel` | `PyCad2026.Commands.cs` | esecuzione comandi con riduzione rumore prompt |
-| `Command`, `CommandSilent`, `RunLisp`, `RunLispQuiet`, `CallLisp` | `PyCad2026.Commands.cs` | pipeline LISP/command |
-| `GetVar*`, `SetVar*`, `SupportsSystemVariables` | `PyCad2026.Commands.cs` | accesso system variables |
-| `ExportShellTranscript` | `PyCad2026.Commands.cs` | export transcript su file |
-| `Zoom*`, `Audit*`, `SaveCommand`, `RunScriptFile`, `OpenScript` | `PyCad2026.Commands.cs` | utility comandi nativi |
-| `AddLine`, `AddCircle`, `AddArc`, `AddPoint` | `PyCad2026.Geometry.cs` | creazione entità geometriche base |
-| `AddText`, `AddMText`, `AddLeader`, `AddLightWeightPolyline`, `AddPolyline` | `PyCad2026.Geometry.cs` | creazione testo/polilinee/leader |
-| `GetLineInfo`, `GetCircleInfo`, `GetArcInfo`, `GetMTextInfo`, `GetLeaderInfo` | `PyCad2026.Geometry.cs` | lettura info geometriche |
-| `SetMText*`, `SetLeaderHasArrowHead`, `SetLeaderHasHookLine` | `PyCad2026.Geometry.cs` | modifica entità testo/leader |
-| `GetCurveLength`, `GetCurvePointAtDistance`, `GetCurveParameterAtPoint` | `PyCad2026.Curves.cs` | query curva (lunghezza/parametri) |
-| `GetPointAtParameter`, `GetParameterAtPoint`, `GetParameterAtDistance` | `PyCad2026.Curves.cs` | conversione punto-parametro |
-| `SplitCurveByParameters`, `BreakCurveAtPoint` | `PyCad2026.Curves.cs` | split e break curve |
-| `GetPolyline*`, `SetPolyline*`, `GetBulgeAt`, `SetBulgeAt` | `PyCad2026.Curves.cs` | API avanzate polilinea |
-| `GetSelectionByLayer`, `GetSelectionByType`, `SelectAll` | `PyCad2026.Selection.cs` | selezioni base |
-| `SelectWindow`, `SelectCrossingWindow` | `PyCad2026.Selection.cs` | selezione per area |
-| `MoveEntity`, `RotateEntity`, `ScaleEntity`, `MirrorEntity`, `CopyEntity` | `PyCad2026.Selection.cs` | trasformazioni singola entità |
-| `MoveEntities`, `RotateEntities`, `ScaleEntities`, `MirrorEntities` | `PyCad2026.Selection.cs` | trasformazioni batch |
-| `OffsetEntity`, `OffsetEntities`, `ExplodeEntity`, `EraseEntity` | `PyCad2026.Selection.cs` | operazioni dirette su entità |
-| `EntMake`, `GetEntityDxfValue`, `SetEntityDxfValue` | `PyCad2026.Dxf.cs` | bridge DXF-like |
-| `GetSelectionByDxf`, `DebugDxfFilterMatch` | `PyCad2026.Dxf.cs` | filtri e debug match DXF |
-| `GetBlockNames`, `GetBlockDefinitionInfo` | `PyCad2026.Blocks.cs` | introspezione blocchi |
-| `InsertBlock`, `GetBlockReferenceInfo` | `PyCad2026.Blocks.cs` | gestione block reference |
-| `GetBlockAttributeDefinitions`, `GetBlockReferenceAttributes`, `SetBlockReferenceAttributes` | `PyCad2026.Blocks.cs` / `PyCad2026.Advanced.cs` | gestione attributi |
-| `SyncBlockReferenceAttributes*`, `UpdateBlockAttributeByTagBatch`, `UpdateBlockAttributesByMapBatch` | `PyCad2026.Blocks.cs` | sync/update batch attributi |
-| `ReplaceBlockReference*`, `RenameBlockAttributeTag`, `ExplodeBlockReferenceEx` | `PyCad2026.Blocks.cs` | replace/rename/explode blocchi |
-| `BreakCurveAtAllIntersections`, `BreakEntitiesAtIntersections` | `PyCad2026.Modify.cs` | break automatico su intersezioni |
-| `TrimCurve*`, `ExtendCurve*`, `TrimCurvesToBoundaries`, `ExtendCurvesToBoundaries` | `PyCad2026.Modify.cs` | trim/extend automatici |
-| `ReverseCurve`, `JoinEntities`, `FilletLines`, `ChamferLines` | `PyCad2026.Modify.cs` | modifica geometrica avanzata |
-| `OffsetEntityTowardPoint`, `OffsetEntityBothSides`, `MatchEntityProperties` | `PyCad2026.Modify.cs` | offset evoluto e match properties |
-| `CreateNamedDictionary`, `GetNamedDictionaryInfo`, `GetNamedDictionaryEntries` | `PyCad2026.Database.cs` | gestione dictionary NOD |
-| `SetNamedXRecord`, `GetNamedXRecord`, `DeleteNamedXRecord` | `PyCad2026.Database.cs` | gestione XRecord nominati |
-| `SetNamedStringMap`, `GetNamedStringMap` | `PyCad2026.Database.cs` | key/value persistenti in dictionary |
-| `SetEntityXRecord`, `GetEntityXRecord`, `SetEntityStringMap`, `GetEntityStringMap` | `PyCad2026.Database.cs` | metadata su extension dictionary entità |
-| `CloneObjectsToOwner`, `CopyXRecordBetween*`, `ListNamedDictionaryTree` | `PyCad2026.Database.cs` | utility clone/copy/traversal DB |
-| `GetViewNames`, `GetUcsNames`, `GetViewUcsViewportStats` | `PyCad2026.Advanced.cs` | overview viste/UCS/viewport |
-| `EnsureNamedView`, `EnsureNamedUcs`, `DeleteNamedView`, `DeleteNamedUcs` | `PyCad2026.Advanced.cs` | gestione named view/UCS |
-| `AddBox`, `AddBoxesBatch`, `GetSolid3dInfo` | `PyCad2026.Advanced.cs` | 3D solids base |
-| `CreateRegionsFromEntities`, `BooleanRegions*`, `ExplodeRegion`, `GetRegionInfo` | `PyCad2026.Advanced.cs` | region API |
-| `GetModelSpaceEntityIds`, `GetPaperSpaceEntityIds`, `CountEntitiesInModelSpaceByDxf` | `PyCad2026.Advanced.cs` | conteggi e scansioni spazi |
-| `GetLayoutNamesFromBlockTable`, `GetEntitiesInSpace`, `GetSpaceEntityStats` | `PyCad2026.Massive.cs` | utility spazio/layout |
-| `EraseByLayerBatch`, `EraseByTypeBatch`, `EraseByDxfFilterBatch` | `PyCad2026.Massive.cs` | cancellazione batch |
-| `GetEntityPropertySnapshot`, `ApplyEntityPropertySnapshot` | `PyCad2026.Massive.cs` | snapshot/apply proprietà |
-| `BuildIntersectionsMatrix`, `BreakCurvesAtAllIntersectionsBatch`, `AutoTrimExtendByBoundaries` | `PyCad2026.Massive.cs` | modify batch deterministic |
-| `CopyTransformBatch`, `OffsetEntitiesTowardSeedsBatch` | `PyCad2026.Massive.cs` | trasformazioni/offset batch |
-| `ExportEntityAuditCsv`, `ExportDatabaseSnapshot`, `ExportApiMethodsReport`, `GetPublicApiMethodNames` | `PyCad2026.Massive.cs` | export/report API |
-| `RunDeterministicModifyPack` | `PyCad2026.Massive.cs` | pack modifica deterministico per test |
-| `GetSpaceSummary`, `AddPaperViewportToSpace`, `GetViewportIdsInSpace`, `EraseViewportsInSpace` | `PyCad2026.Fix19.cs` | tools paperspace/viewport |
-| `GetBlockReferenceIdsByName`, `ReplaceBlockReferencesByName`, `ReplaceBlockReferencesByMap` | `PyCad2026.Fix19.cs` | replace blocchi per nome/mappa |
-| `SyncBlockReferenceAttributesByName`, `UpdateBlockAttributesByNameMap` | `PyCad2026.Fix19.cs` | batch attributi per nome blocco |
-| `ExportApiCompatibilityReport` | `PyCad2026.Fix19.cs` | report compatibilità metodi richiesti |
-| `GetLayerNames`, `GetLayoutTabNames`, `GetLayerEntityCounts`, `GetDxfEntityCountsBySpace` | `PyCad2026.Fix21.cs` | report layer/layout |
-| `MoveEntitiesToLayer`, `MoveEntitiesByDxfToLayer`, `BatchSetEntityVisibility` | `PyCad2026.Fix21.cs` | batch layer/visibility |
-| `GetBlockReferenceCountsByName` | `PyCad2026.Fix21.cs` | conteggio block reference per nome |
-| `GetCurrentLayerName`, `SetCurrentLayerName`, `GetLayerState`, `SetLayerState`, `SetLayerStatesBatch` | `PyCad2026.Fix22.cs` | stato layer e current layer |
-| `GetObjectIdsByHandleStrings`, `GetHandleMap` | `PyCad2026.Fix22.cs` | mapping handle <-> object id |
+| Modulo | Focus |
+|---|---|
+| `PyCad2026.Core.cs` | runtime base, transcript, marker build |
+| `PyCad2026.Commands.cs` | command pipeline, LISP, sysvar |
+| `PyCad2026.Geometry.cs` | creazione entita 2D base, testo, hatch, leader |
+| `PyCad2026.Curves.cs` | info e modifica curve/polilinee |
+| `PyCad2026.Selection.cs` | selezione e trasformazioni |
+| `PyCad2026.Dxf.cs` | EntMake + read/write DXF + filtri |
+| `PyCad2026.Blocks.cs` | blocchi e attributi |
+| `PyCad2026.Modify.cs` | trim/extend/break/join/offset/match |
+| `PyCad2026.Database.cs` | dictionary/XRecord/extension dictionary/clone |
+| `PyCad2026.Advanced.cs` | regioni, solidi 3D, view/UCS, batch avanzati |
+| `PyCad2026.Massive.cs` | batch massivi, report/export, deterministic packs |
+| `PyCad2026.Fix19.cs` | paperspace viewport, replace blocchi, compat report |
 
-## Note
+## Quick start minimale
 
-- Marker build corrente usato nei test: `cad.GetBuildMarker()`
-- Catalogo API esteso: [`API_REFERENCE_2026.md`](./API_REFERENCE_2026.md)
-- Reference parametri (AddText/AddMText/AddLeader/AddLightWeightPolyline/AddPolyline): sezione "Reference dettagliata" in [`API_REFERENCE_2026.md`](./API_REFERENCE_2026.md)
+```python
+p = cad.GetPoint("Punto base:")
+if p and p.Status == 5100:  # PromptStatus.OK
+    x, y, z = p.Value.X, p.Value.Y, p.Value.Z
+    line_id = cad.AddLine(x, y, z, x + 100, y, z)
+    txt_id = cad.AddText("PYLOAD2026R", x, y + 10, z, 2.5)
+    cad.RunCommand("_.REGEN")
+```
+
+## Reference completa
+
+Per firme complete, variabili e parametri di tutte le API pubbliche:
+
+- [`API_REFERENCE_2026.md`](./API_REFERENCE_2026.md)
