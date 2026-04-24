@@ -1,37 +1,60 @@
-# API Reference 2015 (x86)
+# API Reference 2015
 
-Questa pagina è l’indice API per il bridge `PYLOAD` su ZWCAD+ 2015.
+Indice API del progetto `2015/` (ZWCAD+ 2015 x86).
 
-## Dove trovare l’elenco completo
+## Totale API pubbliche
 
-L’elenco completo dei metodi esposti su `cad` è mantenuto qui:
+- **459** metodi pubblici nel bridge (cartella `2015/src`).
 
-- [README.md](./README.md) (sezione `Helper cad`)
+## API per modulo (`2015/src`)
 
-Include già:
+| File | Metodi pubblici |
+|---|---:|
+| `PyCad.Analysis.cs` | 14 |
+| `PyCad.Arcs.cs` | 15 |
+| `PyCad.Attributes.cs` | 10 |
+| `PyCad.Blocks.cs` | 20 |
+| `PyCad.BlocksBatch.cs` | 8 |
+| `PyCad.Collections.cs` | 11 |
+| `PyCad.Commands.cs` | 33 |
+| `PyCad.Core.cs` | 11 |
+| `PyCad.Curves.cs` | 37 |
+| `PyCad.DatabaseAdvanced.cs` | 33 |
+| `PyCad.DimStyles.cs` | 5 |
+| `PyCad.Documents.cs` | 6 |
+| `PyCad.Dxf.cs` | 6 |
+| `PyCad.Entities.cs` | 16 |
+| `PyCad.Entmake.cs` | 31 |
+| `PyCad.Geometry.cs` | 19 |
+| `PyCad.Groups.cs` | 6 |
+| `PyCad.Layers.cs` | 20 |
+| `PyCad.Layouts.cs` | 2 |
+| `PyCad.Modify.cs` | 20 |
+| `PyCad.ModifyAdvanced.cs` | 21 |
+| `PyCad.Polylines.cs` | 37 |
+| `PyCad.Regions.cs` | 6 |
+| `PyCad.Reporting.cs` | 5 |
+| `PyCad.Selection.cs` | 32 |
+| `PyCad.TextStyles.cs` | 5 |
+| `PyCad.ThreeD.cs` | 5 |
+| `PyCad.TransformsAdvanced.cs` | 4 |
+| `PyCad.TwoDLowLevel.cs` | 22 |
+| `PythonLoader.cs` | 1 |
 
-- comandi/shell/LISP
-- geometria 2D/3D
-- DXF-like (`EntMake`, `EntGet`, `EntMod`)
-- filtri selezione DXF
-- blocchi/attributi
-- modify avanzato
-- database avanzato (dizionari/XRecord/metadata)
-- layer/stili/layout/documenti
+## Famiglie API principali
 
-## Mappa per modulo sorgente (`src/`)
+- Comandi/LISP/shell: `RunCommand`, `RunCommands`, `Command`, `RunLisp`, `CallLisp`, `ExportShellTranscript`
+- Geometria: `AddLine`, `AddCircle`, `AddArc`, `AddPolyline`, `AddSpline`, `AddMText`
+- Curva e parametri: `GetPointAtParameter`, `GetParameterAtPoint`, `GetParameterAtDistance`
+- DXF-like: `EntMake`, `EntGet`, `EntGetMap`, `EntMod`, `GetEntityDxfValue`, `SetEntityDxfValue`
+- Selezione: `GetSelectionByDxf`, `GetSelectionByArea`, `GetSelectionByLength`, `SelectWindowByDxf`
+- Blocchi/attributi: `InsertBlock`, `GetBlockAttributes`, `SyncBlockReferenceAttributesBatch`, `UpdateBlockAttributesByMapBatch`, `ReplaceBlockReference`
+- Modify: `BreakCurveAtPoint`, `TrimCurvesToBoundaries`, `ExtendCurvesToBoundaries`, `JoinEntities`, `FilletLines`, `ChamferLines`
+- Database avanzato: `CreateNamedDictionary`, `SetNamedXRecord`, `GetNamedXRecord`, `SetEntityXRecord`, `ListNamedDictionaryTree`
+- Layer/layout/stili: `EnsureLayer`, `SetCurrentLayer`, `GetLayoutNames`, `CreateTextStyle`, `CreateDimensionStyle`
 
-- `PyCad.Core.cs`: core runtime, logging, prompt base
-- `PyCad.Commands.cs`: command pipeline, sysvar, transcript, LISP
-- `PyCad.Geometry.cs`, `PyCad.Curves.cs`, `PyCad.Arcs.cs`, `PyCad.Polylines.cs`: geometria/curve
-- `PyCad.Dxf.cs`, `PyCad.Entmake.cs`: API DXF-like
-- `PyCad.Blocks.cs`, `PyCad.BlocksBatch.cs`, `PyCad.Attributes.cs`: blocchi e attributi
-- `PyCad.Modify.cs`, `PyCad.ModifyAdvanced.cs`, `PyCad.TransformsAdvanced.cs`: modifica e trasformazioni
-- `PyCad.DatabaseAdvanced.cs`: dizionari, XRecord, extension dictionary, copy/delete helpers
-- `PyCad.Selection.cs`: selezione e filtri
-- `PyCad.Documents.cs`, `PyCad.Layouts.cs`, `PyCad.Layers.cs`: documenti/layout/layer
-- `PyCad.TextStyles.cs`, `PyCad.DimStyles.cs`, `PyCad.Groups.cs`: stili e gruppi
+## Lista completa metodi
 
-## Nota
+La lista estesa metodo-per-metodo è mantenuta in:
 
-`2015` e `2026` sono due codebase separate: questa reference riguarda solo il ramo `2015` (32 bit).
+- [`README.md`](./README.md) sezione **Helper `cad`**
