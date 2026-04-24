@@ -56,8 +56,8 @@ Questa sezione spiega i nomi variabili usati in quasi tutte le API.
 
 ## Totale API pubbliche (stato attuale sorgenti)
 
-- Metodi pubblici esposti: **251**
-- File sorgente API: 13
+- Metodi pubblici esposti: **274**
+- File sorgente API: 14
 
 ## Reference per modulo
 
@@ -388,6 +388,40 @@ public int SyncBlockReferenceAttributesByName(string blockName, bool overwriteEx
 public int UpdateBlockAttributesByNameMap(string blockName, Hashtable values)
 public Hashtable ExportApiCompatibilityReport(string outputPath, IList requiredMethods)
 ```
+
+### `PyCad2026.Fix23.cs`
+
+```csharp
+public void RunCommandNoiseFree(string commandText)
+public void RunCommandsNoiseFree(IList commandTexts)
+public void FlushCommandChannel()
+public void FlushCommandChannel(int cancelCount, int enterCount)
+public void RunLispQuiet(string expression)
+public void CommandSilent(IList commandArgs)
+public string[] GetLayerNames()
+public string[] GetLayoutTabNames()
+public Hashtable GetLayerEntityCounts()
+public Hashtable GetLayerEntityCounts(bool onlyModelSpace)
+public Hashtable GetDxfEntityCountsBySpace(string spaceName)
+public int MoveEntitiesToLayer(IList entityIds, string layerName)
+public int MoveEntitiesByDxfToLayer(string dxfType, string layerName, bool onlyModelSpace)
+public int MoveEntitiesByDxfToLayer(IList dxfFilters, string layerName, bool onlyModelSpace)
+public int BatchSetEntityVisibility(IList entityIds, bool visible)
+public Hashtable GetBlockReferenceCountsByName()
+public ObjectId[] GetObjectIdsByHandleStrings(IList handleStrings)
+public Hashtable GetHandleMap(IList entityIds)
+public string GetCurrentLayerName()
+public void SetCurrentLayerName(string layerName)
+public Hashtable GetLayerState(string layerName)
+public bool SetLayerState(string layerName, Hashtable values)
+public Hashtable SetLayerStatesBatch(Hashtable layerStateMap)
+```
+
+Note pratiche:
+
+- Le API `*NoiseFree`, `RunLispQuiet`, `CommandSilent` inviano comandi senza logging nel transcript interno.
+- `GetObjectIdsByHandleStrings` interpreta gli handle in esadecimale (accetta anche prefisso `0x`).
+- `MoveEntitiesByDxfToLayer` supporta sia filtro semplice per tipo DXF sia filtro DXF avanzato via lista `{code,value}`.
 
 ### `PythonLoader2026R.cs`
 

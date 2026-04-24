@@ -27,6 +27,7 @@ Catalogo operativo del bridge esposto negli script `PYLOAD2026R`.
 | `PyCad2026.Advanced.cs` | regioni, solidi 3D, view/UCS, batch avanzati |
 | `PyCad2026.Massive.cs` | batch massivi, report/export, deterministic packs |
 | `PyCad2026.Fix19.cs` | paperspace viewport, replace blocchi, compat report |
+| `PyCad2026.Fix23.cs` | command clean/noise-free, layer/layout tools, handle map, layer state batch |
 
 ## Quick start minimale
 
