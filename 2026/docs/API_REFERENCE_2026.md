@@ -56,8 +56,8 @@ Questa sezione spiega i nomi variabili usati in quasi tutte le API.
 
 ## Totale API pubbliche (stato attuale sorgenti)
 
-- Metodi pubblici esposti: **274**
-- File sorgente API: 14
+- Metodi pubblici esposti: **293**
+- File sorgente API: 15
 
 ## Reference per modulo
 
@@ -422,6 +422,35 @@ Note pratiche:
 - Le API `*NoiseFree`, `RunLispQuiet`, `CommandSilent` inviano comandi senza logging nel transcript interno.
 - `GetObjectIdsByHandleStrings` interpreta gli handle in esadecimale (accetta anche prefisso `0x`).
 - `MoveEntitiesByDxfToLayer` supporta sia filtro semplice per tipo DXF sia filtro DXF avanzato via lista `{code,value}`.
+
+### `PyCad2026.Fix24.cs`
+
+```csharp
+public int GetCommandActiveFlags()
+public Hashtable GetCommandChannelState()
+public void FlushCommandChannelHard()
+public void FlushCommandChannelHard(int cancelCount, int enterCount)
+public void RunCommandSafe(string commandText)
+public void RunCommandsSafe(IList commandTexts)
+public Hashtable RunCommandMacro(IList commandTexts, bool hardFlushBefore, bool hardFlushAfter, int trailingEnters)
+public void ZoomExtentsSafe()
+public void ZoomPreviousSafe()
+public void ZoomCenterSafe(double x, double y, double z, double height)
+public void ZoomWindowSafe(double x1, double y1, double z1, double x2, double y2, double z2)
+public void RegenSafe()
+public void AuditSafe(bool fixErrors)
+public void PrincQuiet(string text)
+public void RunLispMacro(IList expressions, bool hardFlushBefore, bool hardFlushAfter)
+public Hashtable ValidateCommandPipeline(IList smokeCommands)
+public bool TrySetViewCenterNoCmd(double x, double y, double height)
+public bool TrySetViewWindowNoCmd(double x1, double y1, double x2, double y2)
+public bool TryZoomExtentsNoCmd()
+```
+
+Note pratiche:
+
+- `TrySetViewCenterNoCmd` / `TrySetViewWindowNoCmd` / `TryZoomExtentsNoCmd` evitano il passaggio dal command line (`_ZOOM`) usando la view API, quando disponibile.
+- `GetCommandActiveFlags` ritorna `-1` quando `CMDACTIVE` non e disponibile via system variable API nella build host.
 
 ### `PythonLoader2026R.cs`
 

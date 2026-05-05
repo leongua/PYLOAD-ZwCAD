@@ -42,7 +42,7 @@ namespace PYLOAD2026R
 
         public string GetBuildMarker()
         {
-            return "PYLOAD2026R-FIX23";
+            return "PYLOAD2026R-FIX25";
         }
 
         public string GetEntityHandle(ObjectId entityId)
