@@ -29,6 +29,7 @@ Catalogo operativo del bridge esposto negli script `PYLOAD2026R`.
 | `PyCad2026.Fix19.cs` | paperspace viewport, replace blocchi, compat report |
 | `PyCad2026.Fix23.cs` | command clean/noise-free, layer/layout tools, handle map, layer state batch |
 | `PyCad2026.Fix24.cs` | command pipeline hardening, macro safe, zoom non-interattivo (view API) |
+| `PyCad2026.Fix26.cs` | selection stats, filtri DXF per spazio, copy/offset/break/transform batch |
 
 ## Quick start minimale
 

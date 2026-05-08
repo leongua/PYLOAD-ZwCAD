@@ -56,8 +56,8 @@ Questa sezione spiega i nomi variabili usati in quasi tutte le API.
 
 ## Totale API pubbliche (stato attuale sorgenti)
 
-- Metodi pubblici esposti: **293**
-- File sorgente API: 15
+- Metodi pubblici esposti: **300**
+- File sorgente API: 16
 
 ## Reference per modulo
 
@@ -451,6 +451,24 @@ Note pratiche:
 
 - `TrySetViewCenterNoCmd` / `TrySetViewWindowNoCmd` / `TryZoomExtentsNoCmd` evitano il passaggio dal command line (`_ZOOM`) usando la view API, quando disponibile.
 - `GetCommandActiveFlags` ritorna `-1` quando `CMDACTIVE` non e disponibile via system variable API nella build host.
+
+### `PyCad2026.Fix26.cs`
+
+```csharp
+public ObjectId[] SelectByHandles(IList handleStrings)
+public ObjectId[] SelectByDxfInSpace(IList dxfFilters, string spaceName)
+public Hashtable GetSelectionStats(IList entityIds)
+public ObjectId[] CopyEntitiesMultiple(IList entityIds, IList displacements)
+public Hashtable OffsetEntitiesBothSidesBatch(IList entityIds, double offsetDistance)
+public Hashtable BreakCurvesAtPointsBatch(IList jobs, bool eraseSource)
+public Hashtable CopyRotateScaleBatch(IList jobs)
+```
+
+Note pratiche:
+
+- `SelectByDxfInSpace` applica filtri DXF nello spazio richiesto (`*Model_Space`, layout BTR name o tab layout).
+- `GetSelectionStats` restituisce conteggi per layer/tipo e bounding extents aggregati quando disponibili.
+- `BreakCurvesAtPointsBatch` accetta job con shape `{entity_id, x, y, z}`.
 
 ### `PythonLoader2026R.cs`
 
